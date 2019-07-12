@@ -10,7 +10,10 @@ Cluster API는 cloud(or baremetal)에 kubernetes 스타일로 정의된 api로 k
 
 .. figure:: _static/clusterapi-is.png
 
+Cluster API Hands-on 구조
+========================
 
+.. figure:: _static/taco-clusterapi-diagram.png
 
 
 
