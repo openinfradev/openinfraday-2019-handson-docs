@@ -37,7 +37,6 @@ monitor_interface, public_network, cluster_network, ceph_monitors, lvm_molumes �
    monitor_interface: bond0
    public_network: 147.75.93.0/24     
    cluster_network: 147.75.93.0/24    
-   ceph_monitors: 147.75.93.27      
 
 lvm_volumes 설정을 통해 mount되어있지 않은 디스크를 ceph에서 사용할 수 있도록 한다.
 
@@ -128,7 +127,7 @@ br-ex 인터페이스 up 시키고, nat 룰을 추가한다
 .. code-block:: bash
 
    $ cd ~/tacoplay
-   $ tests/taco-test.sh
+   $ scripts/taco-test.sh
 
 
 Trouble Shoothing
