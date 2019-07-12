@@ -5,6 +5,8 @@ Cluster API
 | TACO가 구축된 환경에서 cluster api를 통해 kubernetes를 구축한다.
 | cluster api를 설치하고, master 와 node 두 대에 kubernetes를 구축한다.
 
+.. figure:: _static/clusterapi-is.png
+
 .. seealso::
 
    cluster-api-provider-openstack: https://github.com/kubernetes-sigs/cluster-api-provider-openstack
