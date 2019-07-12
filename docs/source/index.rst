@@ -4,13 +4,14 @@
    contain the root `toctree` directive.
 
 Welcome to OpenInfraDays in Korea Hands-on documentation!
-=========================================
+==========================================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    taco-aio.rst
+   cluster-api.rst
 
 Indices and tables
 ==================
