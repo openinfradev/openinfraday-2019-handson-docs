@@ -53,6 +53,7 @@ lvm_volumes 설정을 통해 mount되어있지 않은 디스크를 ceph에서 �
    nvme0n1 259:0    0   3.5T  0 disk
 
 .. code-block:: bash
+  
    $ vi inventory/sample/extra-vars.yml
    >
 
