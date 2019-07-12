@@ -2,43 +2,11 @@
 TACO install - aio node
 ***********************
 
-tacoplay 설정
-=============
+ceph용 디스크 확인
+==================
 
-* Git 받아오기
-
-.. code-block:: bash
-
-   $ sudo yum install -y git
-   $ git clone https://github.com/openinfradev/tacoplay.git
-   $ cd tacoplay/
-
-* 하위 프로젝트 fetch
-  
-.. code-block:: bash
-
-   $ ./fetch-sub-projects.sh
-
-* ceph-ansible site.yml 생성
-
-.. code-block:: bash
-
-   $ cp ceph-ansible/site.yml.sample ceph-ansible/site.yml
-
-* extra-vars.yml 수정  (경로: tacoplay/inventory/sample)
-
-monitor_interface, public_network, cluster_network, ceph_monitors, lvm_molumes 확인 필요
-
-.. code-block:: bash
-
-   $ vi inventory/sample/extra-vars.yml
-   > 
-   # ceph
-   monitor_interface: bond0
-   public_network: 147.75.93.0/24     
-   cluster_network: 147.75.93.0/24    
-
-lvm_volumes 설정을 통해 mount되어있지 않은 디스크를 ceph에서 사용할 수 있도록 한다.
+ceph에서 사용할 disk준비 확인
+mount 되어있지 않은 디스크명을 확인하여 메모한다.
 
 .. code-block:: bash
 
@@ -51,15 +19,60 @@ lvm_volumes 설정을 통해 mount되어있지 않은 디스크를 ceph에서 �
    sdb       8:16   0 111.8G  0 disk           #마운트 안되어 있으므로 사용 가능
    nvme0n1 259:0    0   3.5T  0 disk
 
+
+tacoplay 설정
+=============
+
+* Tacoplay 받아오기
+
 .. code-block:: bash
+
+   $ sudo yum install -y git
+   $ cd ~
+   $ git clone https://github.com/openinfradev/tacoplay.git
+   $ cd tacoplay/
+
+* 하위 프로젝트들 fetch
   
-   $ vi inventory/sample/extra-vars.yml
-   >
+.. code-block:: bash
 
+   $ ./fetch-sub-projects.sh
+
+* ceph-ansible site.yml 생성
+
+.. code-block:: bash
+
+   $ cp ceph-ansible/site.yml.sample ceph-ansible/site.yml
+
+* extra-vars.yml 수정 
+
+monitor_interface, public_network, cluster_network, ceph_monitors, lvm_molumes 확인 후 적절한 값으로 수정 
+
+.. code-block:: bash
+
+   $ ip a
    ...
-
+   4: bond0: <BROADCAST,MULTICAST,MASTER,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+       link/ether 98:03:9b:2f:3c:b6 brd ff:ff:ff:ff:ff:ff
+       inet 147.75.93.OOO/31 brd 255.255.255.255 scope global bond0
+          valid_lft forever preferred_lft forever
+       inet 10.32.7.1/31 brd 255.255.255.255 scope global bond0:0
+          valid_lft forever preferred_lft forever
+       ...
+ 
+   $ cd ~/tacoplay/inventory/sample
+   $ vi extra-vars.yml
+   >
+   ... 
+   # ceph
+   monitor_interface: bond0
+   public_network: 147.75.93.0/24      <- bond0 의 IP 주소 대역 입력
+   cluster_network: 147.75.93.0/24     <- bond0 의 IP 주소 대역 입력
+   ...
+ 
+   osd_objectstore: bluestore
    lvm_volumes:
-     - data: /dev/sdb
+     - data: /dev/sdb     <- 위에서 확인한 Ceph용 디스크 입력
 
 
 OS 설정
@@ -83,9 +96,7 @@ TACO 설치
 
    # admin 노드에서 실행
    cd ~/tacoplay
-   sudo yum install -y selinux-policy-targeted
-   sudo yum install -y bridge-utils
-   sudo yum install -y epel-release
+   sudo yum install -y selinux-policy-targeted bridge-utils epel-release
    sudo yum install python-pip -y
    sudo pip install --upgrade pip==9.0.3
    sudo pip install -r ceph-ansible/requirements.txt
@@ -100,8 +111,8 @@ TACO 설치
    $ ansible-playbook -b -i inventory/sample/hosts.ini -e @inventory/sample/extra-vars.yml site.yml
 
 ansible-playbook 옵션 설명 
--i :  원하는 곳에 있는 inventory 를 타겟으로 설정
--e : 실행시간에 변수 값 전달 가능
+-i : 사용할 inventory 파일 지정
+-e : 실행시간에 변수 값 전달
 
 
 TACO 설치 확인
@@ -118,35 +129,34 @@ br-ex 인터페이스 up 시키고, nat 룰을 추가한다
 
 * Key 생성
 
+차후 생성할 VM에 접속하기 위한 keypair를 생성한다.
+
 .. code-block:: bash
 
    $ ssh-keygen -t rsa
 
-* 설치 확인
+* Openstack 설치 검증
 
 .. code-block:: bash
 
    $ cd ~/tacoplay
    $ scripts/taco-test.sh
 
-
-Trouble Shoothing
-=================
-
-* Missing value auth-url required for auth plugin password
-
-.. code-block:: bash
-
-   $ . tacoplay/scripts/adminrc
+위의 script를 수행하면 다음과 같은 task들을 수행하여 Openstack이 정상 동작하는지 검증하게 된다.
+- (가상) Network 및 Router 생성
+- Cirros Image upload
+- SecurityGroup 생성
+- Keypair Import
+- VM 생성 후 floating IP 추가
+- Volume 생성 후 VM에 추가
 
 
 VM 생성 후
 ==========
 
-* 생성된 VM 확인
+* 생성된 VM 확인하기
 
-다음과 같은 명령어로 taco-test 스크립트를 돌려 생성된 VM을 확인할 수 있다.
-결과 Networks 란에서 생성된 VM 의 ip 주소를 확인한다.
+다음과 같은 명령어를 통해 taco-test 스크립트를 돌려 생성된 VM을 확인할 수 있다. 결과 Networks 란에서 생성된 VM 의 ip 주소를 확인한다.
 
 .. code-block:: bash
 
@@ -174,6 +184,15 @@ ssh로 VM 에 접속 후, 네트워크 접속 상태를 확인하기 위해 ping
    64 bytes from 8.8.8.8: seq=3 ttl=53 time=1.135 ms
    64 bytes from 8.8.8.8: seq=4 ttl=53 time=1.237 ms
 
+
+Trouble Shoothing
+=================
+
+* Missing value auth-url required for auth plugin password
+
+.. code-block:: bash
+
+   $ . tacoplay/scripts/adminrc
 
 
 

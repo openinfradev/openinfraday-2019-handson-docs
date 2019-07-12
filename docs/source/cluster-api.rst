@@ -1,15 +1,43 @@
 ************
-Cluster API
+Cluster API Hands-on
 ************
 
-| TACO가 구축된 환경에서 cluster api를 통해 kubernetes를 구축한다.
-| cluster api를 설치하고, master 와 node 두 대에 kubernetes를 구축한다.
+Cluster API 란?
+========================
+
+Cluster API는 cloud(or baremetal)에 kubernetes 스타일로 정의된 api로 kubernetes cluster를 생성/설정/관리하는 기능이다.
+사용자는 설치에 필요한 몇몇 yaml파일을 clusterctl 명령어를 이용해서 배포하면 target cloud에 auto-healing, auto-managing되는 kubernetes cluster를 손쉽게 생성할 수 있다.
+
+.. figure:: _static/clusterapi-is.png
 
 .. seealso::
 
    cluster-api-provider-openstack: https://github.com/kubernetes-sigs/cluster-api-provider-openstack
    Go 개발환경: https://golang.org/doc/install
    Kind: https://github.com/kubernetes-sigs/kind
+
+Cluster API Hands-on 구조
+========================
+
+.. figure:: _static/taco-clusterapi-diagram.png
+
+
+Hands-on 후 알게 되는 내용
+========================
+
+CRD (Custom Resource Definition)
+----------
+
+
+  Custom resources can appear and disappear in a running cluster through dynamic registration, and cluster admins can update custom resources independently of the cluster itself. Once a custom resource is installed, users can create and access its objects using kubectl, just as they do for built-in resources like Pods.
+
+
+
+Controller Pattern
+----------
+
+
+  In applications of robotics and automation, a control loop is a non-terminating loop that regulates the state of the system. In Kubernetes, a controller is a control loop that watches the shared state of the cluster through the API server and makes changes attempting to move the current state towards the desired state. Examples of controllers that ship with Kubernetes today are the replication controller, endpoints controller, namespace controller, and serviceaccounts controller.
 
 
 clusterctl 등 tools 빌드
