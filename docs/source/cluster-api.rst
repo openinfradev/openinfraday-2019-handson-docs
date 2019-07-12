@@ -1,9 +1,25 @@
 ************
-Cluster API
+Cluster API Hands-on
 ************
 
+Cluster API 란?
+========================
+
+Cluster API는 cloud(or baremetal)에 kubernetes 스타일로 정의된 api로 kubernetes cluster를 생성/설정/관리하는 기능이다.
+사용자는 설치에 필요한 몇몇 yaml파일을 clusterctl 명령어를 이용해서 배포하면 target cloud에 auto-healing, auto-managing되는 kubernetes cluster를 손쉽게 생성할 수 있다.
+
+.. figure:: _static/clusterapi-is.png
+
+Cluster API Hands-on 구조
+========================
+
+.. figure:: _static/taco-clusterapi-diagram.png
+
+
+
 | TACO가 구축된 환경에서 cluster api를 통해 kubernetes를 구축한다.
-| cluster api를 설치하고, master 와 node 두 대에 kubernetes를 구축한다.
+| clustctl을 설치하고, master 와 node 두 대에 kubernetes를 구축한다.
+
 
 .. seealso::
 
