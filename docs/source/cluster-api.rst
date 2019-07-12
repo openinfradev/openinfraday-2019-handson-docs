@@ -10,22 +10,17 @@ Cluster API는 cloud(or baremetal)에 kubernetes 스타일로 정의된 api로 k
 
 .. figure:: _static/clusterapi-is.png
 
-Cluster API Hands-on 구조
-========================
-
-.. figure:: _static/taco-clusterapi-diagram.png
-
-
-
-| TACO가 구축된 환경에서 cluster api를 통해 kubernetes를 구축한다.
-| clustctl을 설치하고, master 와 node 두 대에 kubernetes를 구축한다.
-
-
 .. seealso::
 
    cluster-api-provider-openstack: https://github.com/kubernetes-sigs/cluster-api-provider-openstack
    Go 개발환경: https://golang.org/doc/install
    Kind: https://github.com/kubernetes-sigs/kind
+
+Cluster API Hands-on 구조
+========================
+
+.. figure:: _static/taco-clusterapi-diagram.png
+
 
 
 clusterctl 등 tools 빌드
