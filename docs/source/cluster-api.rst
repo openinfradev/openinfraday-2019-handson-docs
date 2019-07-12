@@ -62,7 +62,7 @@ clusterctl install
 bootstraping machine tool 설치 (kind)
 -------------------------------------
 
-.. seealso::
+.. code-block:: bash
 
    $ cd ~/
    $ GO111MODULE="on" go get sigs.k8s.io/kind@v0.4.0
