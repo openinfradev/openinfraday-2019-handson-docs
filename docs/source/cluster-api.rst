@@ -321,6 +321,75 @@ KUBECONFIG 설정 후 kind k8s cluster를 확인할 수 있다.
    $ kubectl get nodes --kubeconfig kubeconfig
 
 
+Cluster API Test
+================
+
+Master에 cluster-api pod 확인
+-----------------------------
+
+Openstack instance 조회
+
+.. code-block:: bash
+
+   $ openstack server list
+   +--------------------------------------+------------------------+--------+-------------------------------------+---------------+-----------+
+   | ID                                   | Name                   | Status | Networks                            | Image         | Flavor    |
+   +--------------------------------------+------------------------+--------+-------------------------------------+---------------+-----------+
+   | 96a44562-8fef-42b0-9f98-3345006953b5 | openstack-node-qjcjv   | ACTIVE | private-net=172.30.1.3, 10.10.10.19 | CentOS-7-1905 | m1.medium |
+   | bec5d7b0-99c7-4046-90dc-d443e4062b20 | openstack-master-z5c8n | ACTIVE | private-net=172.30.1.11, 10.10.10.3 | CentOS-7-1905 | m1.medium |
+   | 9a995125-e00c-490e-a945-2689c66abf7f | test                   | ACTIVE | private-net=172.30.1.4              | Cirros-0.4.0  | m1.tiny   |
+   +--------------------------------------+------------------------+--------+-------------------------------------+---------------+-----------+
+
+master 접속 후 namespace, pod 확인
+
+.. code-block:: bash
+
+   $ ssh -i ~/.ssh/openstack_tmp centos@10.10.10.3
+   $ sudo su
+   $ kubectl get namespaces
+   NAME                        STATUS   AGE
+   default                     Active   2d21h
+   kube-node-lease             Active   2d21h
+   kube-public                 Active   2d21h
+   kube-system                 Active   2d21h
+   openstack-provider-system   Active   2d21h
+   system                      Active   2d21h
+   $ kubectl get pods -n openstack-provider-system
+   NAME                       READY   STATUS    RESTARTS   AGE
+   clusterapi-controllers-0   1/1     Running   0          2d21h
+
+
+Self-healing Test
+------------------
+
+Openstack instance 조회
+
+.. code-block::
+
+   $ openstack server list
+   +--------------------------------------+------------------------+--------+-------------------------------------+---------------+-----------+
+   | ID                                   | Name                   | Status | Networks                            | Image         | Flavor    |
+   +--------------------------------------+------------------------+--------+-------------------------------------+---------------+-----------+
+   | 96a44562-8fef-42b0-9f98-3345006953b5 | openstack-node-qjcjv   | ACTIVE | private-net=172.30.1.3, 10.10.10.19 | CentOS-7-1905 | m1.medium |
+   | bec5d7b0-99c7-4046-90dc-d443e4062b20 | openstack-master-z5c8n | ACTIVE | private-net=172.30.1.11, 10.10.10.3 | CentOS-7-1905 | m1.medium |
+   | 9a995125-e00c-490e-a945-2689c66abf7f | test                   | ACTIVE | private-net=172.30.1.4              | Cirros-0.4.0  | m1.tiny   |
+   +--------------------------------------+------------------------+--------+-------------------------------------+---------------+-----------+
+
+node 삭제 후 다시 instance 조회
+
+.. code-block:: bash
+
+   $ openstack server delete openstack-node-qjcjv
+   $ openstack server list
+   +--------------------------------------+------------------------+--------+-------------------------------------+---------------+-----------+
+   | ID                                   | Name                   | Status | Networks                            | Image         | Flavor    |
+   +--------------------------------------+------------------------+--------+-------------------------------------+---------------+-----------+
+   | ec0e0b35-3611-4e65-9415-dccdd7a7c06d | openstack-node-qjcjv   | ACTIVE | private-net=172.30.1.3, 10.10.10.19 | CentOS-7-1905 | m1.medium |
+   | bec5d7b0-99c7-4046-90dc-d443e4062b20 | openstack-master-z5c8n | ACTIVE | private-net=172.30.1.11, 10.10.10.3 | CentOS-7-1905 | m1.medium |
+   | 9a995125-e00c-490e-a945-2689c66abf7f | test                   | ACTIVE | private-net=172.30.1.4              | Cirros-0.4.0  | m1.tiny   |
+   +--------------------------------------+------------------------+--------+-------------------------------------+---------------+-----------+
+
+
 생성과정 debugging
 ==================
 
