@@ -118,7 +118,7 @@ CentOS image upload
 -------------------
 
 CensOS 이미지를 다운받고, 이를 openstack에 업로드한다.
-이 CentOS-7-1905 이미지로 master와 node를 만들 것이다.
+이 CentOS-7-1905 이미지로 master vm와 worker vm을 만들 것이다.
 
 .. code-block:: bash
 
@@ -130,7 +130,7 @@ CensOS 이미지를 다운받고, 이를 openstack에 업로드한다.
 Floating ip 2개 생성
 --------------------
 
-master와 node가 사용할 2개의 floating ip 를 미리 생성한다.
+master vm과 worker vm이 사용할 2개의 floating ip 를 미리 생성한다.
 
 .. code-block:: bash
 
@@ -171,7 +171,7 @@ clusterctl로 배포할 환경의 정보를 입력한다.
 user-data에 hosts 수정 코드 삽입
 --------------------------------
 
-master와 node에서 openstack에 접근할 수 있도록 /etc/hosts 파일을 추가한다.
+master vm과 worker vm 에서 openstack api에 접근할 수 있도록 /etc/hosts 파일을 추가한다.
 
 아래의 두 파일을 열어서 YOUR-NODE-IP를 자신의 ip 주소로 바꾼다.
 
@@ -231,7 +231,7 @@ vm에 넣을 keypair를 만들고 openstack에 등록한다.
 ---------------------------------------------------------------------------
 
 | 아래의 out/machines.yaml을 붙여넣고, 위의 openstack 자원조회 결과를 <PRIVATE-NET-UUID>, <FLOATING-IP>, <SECURITY-GROUP-UUID>에 넣는다.
-| 참고: master 와 node는 각각 다른 floating ip를 사용한다.
+| 참고: master vm과 worker vm은 각각 다른 floating ip를 사용한다.
 
 .. code-block:: yaml
    :Caption: vi out/machines.yaml
@@ -374,11 +374,24 @@ Openstack instance 조회
    | 9a995125-e00c-490e-a945-2689c66abf7f | test                   | ACTIVE | private-net=172.30.1.4              | Cirros-0.4.0  | m1.tiny   |
    +--------------------------------------+------------------------+--------+-------------------------------------+---------------+-----------+
 
-node 삭제 후 다시 instance 조회
+worker vm삭제
 
 .. code-block:: bash
 
    $ openstack server delete openstack-node-qjcjv
+
+clusterapi-controllers log 확인
+
+.. code-block:: bash
+
+   $ ssh -i ~/.ssh/openstack_tmp centos@10.10.10.3
+   $ sudo su
+   $ kubectl logs -f clusterapi-controllers-0 -n openstack-provider-system   
+
+다시 생성된 worker vm 확인
+
+.. code-block:: bash
+
    $ openstack server list
    +--------------------------------------+------------------------+--------+-------------------------------------+---------------+-----------+
    | ID                                   | Name                   | Status | Networks                            | Image         | Flavor    |
