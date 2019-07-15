@@ -23,13 +23,17 @@ mount 되어있지 않은 디스크명을 확인하여 메모한다.
 tacoplay 설정
 =============
 
-* Tacoplay 받아오기
+* Tacoplay 받아서 준비하기
 
 .. code-block:: bash
 
    $ sudo yum install -y git
    $ cd ~
    $ git clone https://github.com/openinfradev/tacoplay.git
+   $ sudo yum install -y selinux-policy-targeted bridge-utils epel-release
+   $ sudo yum install python-pip -y
+   $ sudo pip install --upgrade pip==9.0.3
+   $ ./scripts/prepare.sh ~/tacoplay/inventory/sample/armada-manifest.yaml
    $ cd tacoplay/
 
 * 하위 프로젝트들 fetch
@@ -96,9 +100,6 @@ TACO 설치
 
    # admin 노드에서 실행
    cd ~/tacoplay
-   sudo yum install -y selinux-policy-targeted bridge-utils epel-release
-   sudo yum install python-pip -y
-   sudo pip install --upgrade pip==9.0.3
    sudo pip install -r ceph-ansible/requirements.txt
    sudo pip install -r kubespray/requirements.txt --upgrade
    sudo pip install -r requirements.txt --upgrade
