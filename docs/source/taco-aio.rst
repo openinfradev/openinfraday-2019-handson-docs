@@ -33,7 +33,7 @@ tacoplay 설정
    $ sudo yum install -y selinux-policy-targeted bridge-utils epel-release
    $ sudo yum install python-pip -y
    $ sudo pip install --upgrade pip==9.0.3
-   $ ./prepare.sh ~/tacoplay/inventory/sample/armada-manifest.yaml
+   $ ./scripts/prepare.sh ~/tacoplay/inventory/sample/armada-manifest.yaml
    $ cd tacoplay/
 
 * 하위 프로젝트들 fetch
