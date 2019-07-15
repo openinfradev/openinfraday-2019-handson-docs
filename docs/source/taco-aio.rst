@@ -27,14 +27,12 @@ tacoplay 설정
 
 .. code-block:: bash
 
-   $ sudo yum install -y git
-   $ cd ~
-   $ git clone https://github.com/openinfradev/tacoplay.git
-   $ sudo yum install -y selinux-policy-targeted bridge-utils epel-release
-   $ sudo yum install python-pip -y
+   $ sudo yum install -y git selinux-policy-targeted bridge-utils epel-release
+   $ sudo yum install -y python-pip
    $ sudo pip install --upgrade pip==9.0.3
-   $ ./scripts/prepare.sh ~/tacoplay/inventory/sample/armada-manifest.yaml
+   $ git clone https://github.com/openinfradev/tacoplay.git
    $ cd tacoplay/
+   $ ./scripts/prepare.sh ~/tacoplay/inventory/sample/armada-manifest.yaml
 
 * 하위 프로젝트들 fetch
   
