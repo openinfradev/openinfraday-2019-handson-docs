@@ -1,6 +1,6 @@
-************
+*********************
 Cluster API Hands-on
-************
+*********************
 
 Cluster API 란?
 ========================
@@ -16,26 +16,25 @@ Cluster API는 cloud(or baremetal)에 kubernetes 스타일로 정의된 api로 k
    Go 개발환경: https://golang.org/doc/install
    Kind: https://github.com/kubernetes-sigs/kind
 
+
 Cluster API Hands-on 구조
-========================
+==========================
 
 .. figure:: _static/taco-clusterapi-diagram.png
 
 
 Hands-on 후 알게 되는 내용
-========================
+===========================
 
 CRD (Custom Resource Definition)
-----------
-
+---------------------------------
 
   Custom resources can appear and disappear in a running cluster through dynamic registration, and cluster admins can update custom resources independently of the cluster itself. Once a custom resource is installed, users can create and access its objects using kubectl, just as they do for built-in resources like Pods.
 
 
 
 Controller Pattern
-----------
-
+-------------------
 
   In applications of robotics and automation, a control loop is a non-terminating loop that regulates the state of the system. In Kubernetes, a controller is a control loop that watches the shared state of the cluster through the API server and makes changes attempting to move the current state towards the desired state. Examples of controllers that ship with Kubernetes today are the replication controller, endpoints controller, namespace controller, and serviceaccounts controller.
 
