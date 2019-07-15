@@ -13,7 +13,6 @@ Cluster API는 cloud(or baremetal)에 kubernetes 스타일로 정의된 api로 k
 .. seealso::
 
    cluster-api-provider-openstack: https://github.com/kubernetes-sigs/cluster-api-provider-openstack
-   Go 개발환경: https://golang.org/doc/install
    Kind: https://github.com/kubernetes-sigs/kind
 
 
