@@ -15,18 +15,21 @@ tacoplay 설정
    $ git clone https://github.com/openinfradev/tacoplay.git
    $ cd tacoplay/
    $ ./scripts/prepare.sh ~/tacoplay/inventory/sample/armada-manifest.yaml
+   
 
 * 하위 프로젝트들 fetch
   
 .. code-block:: bash
 
    $ ./fetch-sub-projects.sh
+   
 
 * ceph-ansible site.yml 생성
 
 .. code-block:: bash
 
    $ cp ceph-ansible/site.yml.sample ceph-ansible/site.yml
+   
 
 * extra-vars.yml 수정 
 
@@ -68,6 +71,7 @@ monitor_interface, public_network, cluster_network, lvm_molumes 확인 후 적�
      - data: /dev/sdb     <- 위에서 확인한 Ceph용 디스크 입력
 
 
+
 OS 설정
 =======
 
@@ -78,6 +82,7 @@ OS 설정
    $ sudo vi /etc/hosts
    ## TACO ClusterInfo
    127.0.0.1   taco-aio
+   
 
 
 TACO 설치
@@ -91,6 +96,7 @@ TACO 설치
    sudo pip install -r ceph-ansible/requirements.txt
    sudo pip install -r kubespray/requirements.txt --upgrade
    sudo pip install -r requirements.txt --upgrade
+   
 
 * Taco 설치
 
@@ -98,6 +104,7 @@ TACO 설치
 
    $ cd ~/tacoplay
    $ ansible-playbook -b -i inventory/sample/hosts.ini -e @inventory/sample/extra-vars.yml site.yml
+   
 
 | ansible-playbook 옵션 설명 
 | -i : 사용할 inventory 파일 지정
@@ -115,6 +122,7 @@ br-ex 인터페이스 up 시키고, nat 룰을 추가한다
    
    $ cd ~/tacoplay
    $ ./scripts/init-network.sh
+   
 
 * Key 생성
 
@@ -123,6 +131,7 @@ br-ex 인터페이스 up 시키고, nat 룰을 추가한다
 .. code-block:: bash
 
    $ ssh-keygen -t rsa
+   
 
 * Openstack 설치 검증
 
@@ -130,6 +139,7 @@ br-ex 인터페이스 up 시키고, nat 룰을 추가한다
 
    $ cd ~/tacoplay
    $ scripts/taco-test.sh
+   
 
 | 위의 script를 수행하면 다음과 같은 task들을 수행하여 Openstack이 정상 동작하는지 검증하게 된다.
 | - (가상) Network 및 Router 생성
@@ -158,6 +168,7 @@ VM 생성 후
    | 4dd41f3c-f230-4100-aaaf-3c58cc942463 | test | ACTIVE | private-net=172.30.1.7, 10.10.10.3 | Cirros-0.4.0 | m1.tiny |
    +--------------------------------------+------+--------+------------------------------------+--------------+---------+
 
+
 * 생성된 VM에 접속, 외부 통신 확인
 
 ssh로 VM 에 접속 후, 네트워크 접속 상태를 확인하기 위해 ping 테스트를 수행한다. ( 8.8.8.8 은 구글 퍼블릭 DNS ip주소)
@@ -174,6 +185,7 @@ ssh로 VM 에 접속 후, 네트워크 접속 상태를 확인하기 위해 ping
    64 bytes from 8.8.8.8: seq=4 ttl=53 time=1.237 ms
 
 
+
 Trouble Shoothing
 =================
 
@@ -182,6 +194,7 @@ Trouble Shoothing
 .. code-block:: bash
 
    $ . tacoplay/scripts/adminrc
+
 
 
 
