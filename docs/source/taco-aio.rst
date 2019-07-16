@@ -37,7 +37,7 @@ tacoplay 설정
 
 lsblk 명령어를 통해 ceph에서 사용할 수 있는 디스크를 확인한다. 
 
-.. figure:: _static/lsblk.png
+.. figure:: _static/lsblk2.png
 
 ip a 명령어로 bond0의 ip주소를 확인한다.
 
@@ -48,7 +48,7 @@ ip a 명령어로 bond0의 ip주소를 확인한다.
    $ cd ~/tacoplay/inventory/sample
    $ vi extra-vars.yml
 
-.. figure:: _static/extravars.png
+.. figure:: _static/extravars2.png
 
 
 OS 설정
