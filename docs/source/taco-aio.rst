@@ -33,45 +33,22 @@ tacoplay 설정
 
 * extra-vars.yml 수정 
 
-monitor_interface, public_network, cluster_network, lvm_molumes 확인 후 적절한 값으로 수정 
+| - monitor_interface, public_network, cluster_network, lvm_molumes 확인 후 적절한 값으로 수정 
+
+lsblk 명령어를 통해 ceph에서 사용할 수 있는 디스크를 확인한다. 
+
+.. figure:: _static/lsblk.png
+
+ip a 명령어로 bond0의 ip주소를 확인한다.
+
+.. figure:: _static/ipa.png
 
 .. code-block:: bash
 
-   $ ip a 
-   ...
-   4: bond0: <BROADCAST,MULTICAST,MASTER,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
-       link/ether 98:03:9b:2f:3c:b6 brd ff:ff:ff:ff:ff:ff
-       inet 147.75.93.OOO/31 brd 255.255.255.255 scope global bond0
-          valid_lft forever preferred_lft forever
-       inet 10.32.7.1/31 brd 255.255.255.255 scope global bond0:0
-          valid_lft forever preferred_lft forever
-   ...
-
-   $ lsblk <- ceph에서 사용할 disk 확인
-   NAME    MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
-   sda       8:0    0 111.8G  0 disk
-   |-sda1    8:1    0     2M  0 part
-   |-sda2    8:2    0   1.9G  0 part [SWAP]
-   `-sda3    8:3    0 109.9G  0 part /
-   sdb       8:16   0 111.8G  0 disk           #마운트 안되어 있으므로 사용 가능
-   sdc       8:32   0 111.8G  0 disk           #마운트 안되어 있으므로 사용 가능
-   nvme0n1 259:0    0   3.5T  0 disk
- 
    $ cd ~/tacoplay/inventory/sample
    $ vi extra-vars.yml
-   >
-   ... 
-   # ceph
-   monitor_interface: bond0
-   public_network: 147.75.93.0/24      <- bond0 의 IP 주소 대역 입력
-   cluster_network: 147.75.93.0/24     <- bond0 의 IP 주소 대역 입력
-   ...
- 
-   osd_objectstore: bluestore
-   lvm_volumes:
-     - data: /dev/sdb     <- 위에서 확인한 Ceph용 디스크 입력
-     - data: /dev/sdc     <- 위에서 확인한 Ceph용 디스크 입력
 
+.. figure:: _static/extravars.png
 
 
 OS 설정
