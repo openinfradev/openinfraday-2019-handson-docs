@@ -54,6 +54,7 @@ monitor_interface, public_network, cluster_network, lvm_molumes 확인 후 적�
    |-sda2    8:2    0   1.9G  0 part [SWAP]
    `-sda3    8:3    0 109.9G  0 part /
    sdb       8:16   0 111.8G  0 disk           #마운트 안되어 있으므로 사용 가능
+   sdc       8:32   0 111.8G  0 disk           #마운트 안되어 있으므로 사용 가능
    nvme0n1 259:0    0   3.5T  0 disk
  
    $ cd ~/tacoplay/inventory/sample
@@ -69,6 +70,7 @@ monitor_interface, public_network, cluster_network, lvm_molumes 확인 후 적�
    osd_objectstore: bluestore
    lvm_volumes:
      - data: /dev/sdb     <- 위에서 확인한 Ceph용 디스크 입력
+     - data: /dev/sdc     <- 위에서 확인한 Ceph용 디스크 입력
 
 
 
