@@ -337,7 +337,7 @@ Useful Commands
 * 143-check-user-data-vm.sh: 생성된 master vm의 user-data 파일을 확인한다. YOUR-NODE-IP가 host의 ip로 잘 바뀌었는지 확인한다.
 * 144-logs-cloud-init-vm.sh: master vm이 생성되고 init되는 과정의 log를 확인한다.
 * 145-logs-k8s-install-vm.sh: init 이후, vm에 k8s가 구축되는 과정의 log를 확인한다.
-* 146-delete-kind.sh: kind cluster와 생성된 master 및 worker vm을 삭제한다. clusterctl 도중 문제가 발생했을 경우 이 script를 실행하고 다시 cluster를 구축한다.
+* 146-delete-kind.sh: kind cluster와 생성된 master 및 worker vm을 삭제한다. clusterctl 도중 문제가 발생했을 경우 이 script를 실행하고 03 script	부터 다시 실행하여 새로운 cluster를 구축한다.
 
 05-check-pivot
 ===============
