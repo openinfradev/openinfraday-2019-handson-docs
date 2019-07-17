@@ -108,13 +108,14 @@ Open source로부터 git clone을 받고, clusterctl binary 파일을 생성한�
    $ make clusterctl
    $ rm -rf ~/go/bin/clusterctl
    $ cp -f $GOPATH/src/sigs.k8s.io/cluster-api-provider-openstack/bin/clusterctl ~/go/bin/
+   $
 
 
 bootstraping machine tool 설치 (kind)
 -------------------------------------
 
-kind(kubernetes in docker)를 설치한다.
-kind 는 bootstraping machine으로, 처음에 custom resource를 정의하고 생성하는 역할을 한다.
+| kind(kubernetes in docker)를 설치한다.
+| kind 는 bootstraping machine으로, 처음에 cluster-api가 kind에 custom resource를 정의한다.
 
 .. code-block:: bash
 
@@ -181,7 +182,7 @@ create ~/clouds.yaml
 clusterctl로 배포할 환경의 정보를 입력한다.
 이 Hands-on에서는 openstack으로 cluster를 배포한다.
 따라서, TACO로 구축한 openstack에 대한 정보를 clouds.yaml로 만들고
-파일을 kind에 넘겨주면, kind는 이를 바탕으로 openstack client와 통신하며 cluster를 배포한다.
+cluster api는 이를 바탕으로 openstack client와 통신하며 cluster를 배포한다.
 
 아래의 결과로 얻은 openstack의 admin project ID를 clouds.yaml에 넣어준다.
 
@@ -210,13 +211,13 @@ clusterctl로 배포할 환경의 정보를 입력한다.
 
 
 user-data에 hosts 수정 코드 삽입
---------------------------------
+---------------------------------
 
 맨 위의 그림에서 볼 수 있듯이, clusterapi-controller가 kubernetess cluster로 pivot 된 이후
 kubernetes cluster에서 openstack api와 통신하면서 cluster의 상태를 확인한다.
 
-이 작업은 cluster에서 openstack api에 접근할 수 있도록 host 정보를 알려주는 과정이다.
-master와 worker의 user-data.sh 파일에서 YOUR-NODE-IP를 자신의 **host** ip로 바꿔준다.
+| 이 작업은 cluster에서 openstack api에 접근할 수 있도록 openstack service endpoint 정보를 알려주는 과정이다.
+| master와 worker의 user-data.sh 파일에서 YOUR-NODE-IP를 자신의 **HOST** ip로 바꿔준다.
 
 .. code-block:: bash
 
@@ -251,6 +252,7 @@ vm에 넣을 keypair를 만들고 openstack에 등록한다.
 .. code-block:: bash
 
    $ openstack keypair create --public-key ~/.ssh/openstack_tmp.pub cluster-api-provider-openstack
+   $
 
 
 machines.yaml 수정
@@ -327,6 +329,7 @@ create k8s cluster on openstack
 .. code-block:: bash
 
    $ clusterctl create cluster --bootstrap-type kind --provider openstack -c ~/cluster.yaml -m ~/machines.yaml -p ~/provider-components.yaml
+   $   
 
 Useful Commands
 ----------------
