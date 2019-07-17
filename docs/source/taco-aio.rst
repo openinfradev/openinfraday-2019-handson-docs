@@ -18,7 +18,12 @@ tacoplay 설정
    
 
 * 하위 프로젝트들 fetch
-  
+
+| - armada :  armada 설치에 필요한 소스
+| - ceph-ansible : ceph 설치에 사용되는 ansible playbook
+| - kubespray : kubernetes 설치에 사용되는 ansible playbook
+| - charts : kubernetes위에 openstack을 배포하는 데 필요한 helm chart  
+
 .. code-block:: bash
 
    $ ./fetch-sub-projects.sh
@@ -30,18 +35,33 @@ tacoplay 설정
 
    $ cp ceph-ansible/site.yml.sample ceph-ansible/site.yml
    
+* hosts.ini 파일 설명
 
-* extra-vars.yml 수정 
+| taco 클러스터를 구성하는 노드들을 역할에 맞게 정의한다.
+| - kubespray : etcd / kube-master / kube-node / kube-cluster
+| - ceph-ansible : mons / osds / mgrs / clients
+| - openstack : controller-node / compute-node 
+| - tacoplay : admin-node / registry / controller-node / compute-node
+| 
+| ex) 노드 3대를 사용할 때 
 
+.. figure:: _static/hostsini.png
+
+* extra-vars.yml 파일 설명 
+
+ansible-playbook 실행 시 필요한 변수 값을 정의한다.
+ 
 | - monitor_interface, public_network, cluster_network, lvm_molumes 확인 후 적절한 값으로 수정 
 
 lsblk 명령어를 통해 ceph에서 사용할 수 있는 디스크를 확인한다. 
 
 .. figure:: _static/lsblk2.png
 
-ip a 명령어로 bond0의 ip주소를 확인한다.
+ip a 명령어로 host의 ip주소를 확인한다.
 
 .. figure:: _static/ipa.png
+
+lsblk와 ip a 명령어를 통해 확인한 값들로 extra-vars.yml 파일의 monitor_interface, public_network, cluster_network, lvm_molumes를 변경
 
 .. code-block:: bash
 
@@ -101,16 +121,6 @@ br-ex 인터페이스 up 시키고, nat 룰을 추가한다
    
    $ cd ~/tacoplay
    $ ./scripts/init-network.sh
-   
-
-* Key 생성
-
-차후 생성할 VM에 접속하기 위한 keypair를 생성한다.
-
-.. code-block:: bash
-
-   $ ssh-keygen -t rsa
-   
 
 * Openstack 설치 검증
 
