@@ -10,8 +10,9 @@ Cluster API는 cloud(or baremetal)에 kubernetes 스타일로 정의된 api로 k
 
 .. figure:: _static/clusterapi-is.png
 
-.. seealso::
+::
 
+   See also:
    cluster-api-provider-openstack: https://github.com/kubernetes-sigs/cluster-api-provider-openstack
    Kind: https://github.com/kubernetes-sigs/kind
 
@@ -38,8 +39,26 @@ Controller Pattern
   In applications of robotics and automation, a control loop is a non-terminating loop that regulates the state of the system. In Kubernetes, a controller is a control loop that watches the shared state of the cluster through the API server and makes changes attempting to move the current state towards the desired state. Examples of controllers that ship with Kubernetes today are the replication controller, endpoints controller, namespace controller, and serviceaccounts controller.
 
 
-clusterctl 등 tools 빌드
-========================
+----------------
+
+
+00-clone-scripts
+==================
+
+clusterapi-scripts를 clone 받는다.
+
+.. code block:: bash
+
+   $ git clone https://github.com/openinfradev/openinfraday-2019-clusterapi-scripts.git
+   $ cd openinfraday-2019-clusterapi-scripts
+
+이후에는 ``./01-install-tools.sh`` 와 같이 scripts를 하나씩 실행하면 된다.
+
+
+01-install-tools
+==================
+
+go, yq, clusterctl 등 필요한 tool들을 설치한다.
 
 go install
 ----------
@@ -52,13 +71,16 @@ binary file 다운 및 압축 해제
 
    $ wget https://dl.google.com/go/go1.12.7.linux-amd64.tar.gz
    $ tar -C /usr/local -xzf go1.12.7.linux-amd64.tar.gz
+   $ rm -f ./go1.12.7.linux-amd64.tar.gz
 
 bashrc에 다음 두 줄을 추가한다.
 
 .. code-block:: yaml
 
+   $ cat >> ~/.bashrc <<EOF
    export PATH=$PATH:/usr/local/go/bin:/root/go/bin
    export GOPATH=$HOME/go
+   EOF
 
 .. code-block:: bash
 
@@ -77,16 +99,22 @@ yq install
 clusterctl install
 ------------------
 
+Open source로부터 git clone을 받고, clusterctl binary 파일을 생성한다.
+
 .. code-block:: bash
 
    $ git clone -b taco-clusterapi https://github.com/openinfradev/cluster-api-provider-openstack.git $GOPATH/src/sigs.k8s.io/cluster-api-provider-openstack
    $ cd $GOPATH/src/sigs.k8s.io/cluster-api-provider-openstack/
    $ make clusterctl
-   $ ln -s $GOPATH/src/sigs.k8s.io/cluster-api-provider-openstack/bin/clusterctl ~/go/bin/clusterctl
+   $ rm -rf ~/go/bin/clusterctl
+   $ cp -f $GOPATH/src/sigs.k8s.io/cluster-api-provider-openstack/bin/clusterctl ~/go/bin/
 
 
 bootstraping machine tool 설치 (kind)
 -------------------------------------
+
+kind(kubernetes in docker)를 설치한다.
+kind 는 bootstraping machine으로, 처음에 custom resource를 정의하고 생성하는 역할을 한다.
 
 .. code-block:: bash
 
@@ -94,13 +122,17 @@ bootstraping machine tool 설치 (kind)
    $ GO111MODULE="on" go get sigs.k8s.io/kind@v0.4.0
 
 
-Openstack Resource 준비
-=======================
+02-prepare-openstack-resource
+===============================
+
+필요한 Openstack Resource들을 준비한다.
+vm에 적용할 security group을 만들고, CentOS image를 업로드하고, vm에 부여할 floating ip를 만든다.
 
 security group
 --------------
 
-openstack client 를 통해서 cluster api가 사용할 openstack security group을 만든다.
+openstack client 를 통해서 security group(보안그룹)을 정의한다.
+security group을 통해 만들어진 vm으로 들어오고 나가는 트래픽을 세부적으로 제어할 수 있다.
 
 .. code-block:: bash
 
@@ -121,15 +153,16 @@ CensOS 이미지를 다운받고, 이를 openstack에 업로드한다.
 
 .. code-block:: bash
 
-   wget https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.raw.tar.gz
-   tar zxvf CentOS-7-x86_64-GenericCloud.raw.tar.gz
-   openstack image create 'CentOS-7-1905' --disk-format raw --file ~/CentOS-7-x86_64-GenericCloud-1905.raw --container-format bare --public
-
+   cd ~/
+   wget https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud-1905.qcow2
+   openstack image create 'CentOS-7-1905' --disk-format qcow2 --file ~/CentOS-7-x86_64-GenericCloud-1905.qcow2 --container-format bare --public
+   rm -f CentOS-7-x86_64-GenericCloud-1905.qcow2
 
 Floating ip 2개 생성
 --------------------
 
-master vm과 worker vm이 사용할 2개의 floating ip 를 미리 생성한다.
+master vm과 worker vm에 부여할 2개의 floating ip 를 미리 생성한다.
+여기서 생성한 floating ip 를 통해 host와 vm이 통신하게 된다.
 
 .. code-block:: bash
 
@@ -137,13 +170,18 @@ master vm과 worker vm이 사용할 2개의 floating ip 를 미리 생성한다.
    $ openstack floating ip create public-net
 
 
-clusterctl 실행 준비
-====================
+03-prepare-clusterctl
+======================
+
+clusterctl 실행하기에 앞선 준비작업을 한다.
 
 create ~/clouds.yaml
 --------------------
 
 clusterctl로 배포할 환경의 정보를 입력한다.
+이 Hands-on에서는 openstack으로 cluster를 배포한다.
+따라서, TACO로 구축한 openstack에 대한 정보를 clouds.yaml로 만들고
+파일을 kind에 넘겨주면, kind는 이를 바탕으로 openstack client와 통신하며 cluster를 배포한다.
 
 아래의 결과로 얻은 openstack의 admin project ID를 clouds.yaml에 넣어준다.
 
@@ -154,6 +192,9 @@ clusterctl로 배포할 환경의 정보를 입력한다.
 .. code-block:: yaml
    :Caption: vi ~/clouds.yaml
 
+   PROJECT_ID=$(openstack project list | grep admin | awk '{print $2}')
+   
+   cat > ~/clouds.yaml <<EOF
    clouds:
      taco-openstack:
        auth:
@@ -163,44 +204,40 @@ clusterctl로 배포할 환경의 정보를 입력한다.
          password: password
          user_domain_name: Default
          project_domain_name: Default
-         project_id: <PROJECT_ID>
+         project_id: ${PROJECT_ID}
        region_name: RegionOne
+   EOF
 
 
 user-data에 hosts 수정 코드 삽입
 --------------------------------
 
-master vm과 worker vm 에서 openstack api에 접근할 수 있도록 /etc/hosts 파일을 추가한다.
+맨 위의 그림에서 볼 수 있듯이, clusterapi-controller가 kubernetess cluster로 pivot 된 이후
+kubernetes cluster에서 openstack api와 통신하면서 cluster의 상태를 확인한다.
 
-아래의 두 파일을 열어서 YOUR-NODE-IP를 자신의 ip 주소로 바꾼다.
+이 작업은 cluster에서 openstack api에 접근할 수 있도록 host 정보를 알려주는 과정이다.
+master와 worker의 user-data.sh 파일에서 YOUR-NODE-IP를 자신의 **host** ip로 바꿔준다.
 
 .. code-block:: bash
 
-   $ cd $GOPATH/src/sigs.k8s.io/cluster-api-provider-openstack/cmd/clusterctl/examples/openstack
-   $ vi provider-component/user-data/centos/templates/master-user-data.sh
-   $ vi provider-component/user-data/centos/templates/worker-user-data.sh
+   $ IP=$(ifconfig bond0 | grep netmask | awk '{print $2}')
+   
+   $ cd $GOPATH/src/sigs.k8s.io/cluster-api-provider-openstack/cmd/clusterctl/examples/openstack/provider-component/user-data/centos/templates
 
-.. code-block:: yaml
-
-   #!/bin/bash
-   set -e
-   set -x
-   cat >> /etc/hosts <<EOF
-   YOUR-NODE-IP horizon.openstack.svc.cluster.local
-   YOUR-NODE-IP keystone.openstack.svc.cluster.local
-   YOUR-NODE-IP glance.openstack.svc.cluster.local
-   YOUR-NODE-IP nova.openstack.svc.cluster.local
-   YOUR-NODE-IP neutron.openstack.svc.cluster.local
-   YOUR-NODE-IP cinder.openstack.svc.cluster.local
-   EOF
+   $ sed -i "s/YOUR-NODE-IP/${IP}/g" master-user-data.sh
+   $ sed -i "s/YOUR-NODE-IP/${IP}/g" worker-user-data.sh
 
 
 YAML 생성
 ---------
 
+generate-yaml.sh을 통해 cluster와 machine에 대한 yaml 파일을 생성한다.
+여기는 template만 만드는 과정이고, 후에 배포할 환경에 맞추어 변수들을 바꿔줄 것이다.
+
 .. code-block:: bash
 
    $ cd $GOPATH/src/sigs.k8s.io/cluster-api-provider-openstack/cmd/clusterctl/examples/openstack
+   $ rm -rf out
    $ ./generate-yaml.sh -f ~/clouds.yaml taco-openstack centos
    $ ls out/
    cluster.yaml machines.yaml provider-components.yaml
@@ -216,219 +253,122 @@ vm에 넣을 keypair를 만들고 openstack에 등록한다.
    $ openstack keypair create --public-key ~/.ssh/openstack_tmp.pub cluster-api-provider-openstack
 
 
-설정을 위한 openstack 자원조회
-------------------------------
+machines.yaml 수정
+------------------
+
+배포할 환경에 맞게 machines.yaml 파일을 수정한다.
+
+1. image, username, network, securitygroup 설정
+
+   * **image**: vm이 사용할 image를 설정한다. 앞에서 등록한 CentOS-7-1905 사용.
+   * **username**: vm으로 ssh 접속할 때 username을 설정한다. CensOS 기본 username 사용.
+   * **network**: vm이 사용할 네트워크를 설정한다.(private-net 사용)
+   * **securitygroup**: vm에 적용할 보안그룹 정책을 설정한다. 앞에서 설정한 clusterapi 사용.
 
 .. code-block:: bash
 
-   $ openstack network list | grep private-net | awk '{print $2}'
-   $ openstack floating ip list
-   $ openstack security group list | grep clusterapi | awk '{print $2}'
+   $ NETWORK_UUID=$(openstack network list | grep private-net | awk '{print $2}')
+   $ SECURITY_GROUP=$(openstack security group list | grep clusterapi | awk '{print $2}')
+   $ sed -i "s/<Image Name>/CentOS-7-1905/g" out/machines.yaml
+   $ sed -i "s/<SSH Username>/centos/g" out/machines.yaml
+   $ sed -i "s/<Kubernetes Network ID>/${NETWORK_UUID}/g" out/machines.yaml
+   $ sed -i "s/<Security Group ID>/${SECURITY_GROUP}/g" out/machines.yaml
+   $ sed -i "s/1.14.0/1.14.3/g" out/machines.yaml
+
+2. floating ip 설정
+
+   * 사용되고 있지 않은 floating ip를 조회하여, master와 worker에 각각 하나씩 부여한다.
+
+.. code-block:: bash
+
+   $ FLOATING_IP_1=$(openstack floating ip list | grep None | head -n 1 | awk '{print $4}')
+   $ FLOATING_IP_2=$(openstack floating ip list | grep None | head -n 2 | tail -n 1 | awk '{print $4}')
+   $ FLOATING_IP_LINENUM_1=$(cat out/machines.yaml | grep -n floatingIP | awk '{print $1}' | tr -d ':' | head -n 1)
+   $ FLOATING_IP_LINENUM_2=$(cat out/machines.yaml | grep -n floatingIP | awk '{print $1}' | tr -d ':' | tail -n 1)
+   $ sed -i "${FLOATING_IP_LINENUM_1}s/<Available Floating IP>/${FLOATING_IP_1}/" out/machines.yaml
+   $ sed -i "${FLOATING_IP_LINENUM_2}s/<Available Floating IP>/${FLOATING_IP_2}/" out/machines.yaml
+
+3. tags, serverMeta 등 불필요한 내용 삭제
+
+   * tags와 serverMeta에 대한 내용을 삭제한다.
+
+.. code-block:: bash
+
+   $ TAGS_LINENUM_1=$(cat out/machines.yaml | grep -n tags | awk '{print $1}' | tr -d ':' | head -n 1)
+   $ if [[ ! -z "$TAGS_LINENUM_1" ]]; then
+     sed -i "${TAGS_LINENUM_1},$(($TAGS_LINENUM_1+3))d" out/machines.yaml
+   fi
+   $ TAGS_LINENUM_2=$(cat out/machines.yaml | grep -n tags | awk '{print $1}' | tr -d ':' | tail -n 1)
+   if [[ ! -z "$TAGS_LINENUM_2" ]]; then
+     sed -i "${TAGS_LINENUM_2},$(($TAGS_LINENUM_2+3))d" out/machines.yaml
+   fi
+
+4. home directory로 복사
+
+   * 설정이 완료된 yaml 파일을 홈으로 복사한다.
+
+.. code-block:: bash
+
+   $ cp -f out/cluster.yaml ~/
+   $ cp -f out/machines.yaml ~/
+   $ cp -f out/provider-components.yaml ~/
 
 
-구축된 openstack 환경에 맞게 설정, tag 및 serverMeta 등 불필요한 내용 삭제
----------------------------------------------------------------------------
+04-make-cluster
+================
 
-| 아래의 out/machines.yaml을 붙여넣고, 위의 openstack 자원조회 결과를 <PRIVATE-NET-UUID>, <FLOATING-IP>, <SECURITY-GROUP-UUID>에 넣는다.
-| 참고: master vm과 worker vm은 각각 다른 floating ip를 사용한다.
-
-.. code-block:: yaml
-   :Caption: vi out/machines.yaml
-
-   items:
-   - apiVersion: "cluster.k8s.io/v1alpha1"
-     kind: Machine
-     metadata:
-       generateName: openstack-master-
-       labels:
-         set: master
-     spec:
-       providerSpec:
-         value:
-           apiVersion: "openstackproviderconfig/v1alpha1"
-           kind: "OpenstackProviderSpec"
-           flavor: cluster
-           image: CentOS-7-1905
-           sshUserName: centos
-           keyName: cluster-api-provider-openstack
-           availabilityZone: nova
-           networks:
-           - uuid: <PRIVATE-NET-UUID>
-           floatingIP: <FLOATING-IP>
-           securityGroups:
-           - uuid: <SECURITY-GROUP-UUID>
-           userDataSecret:
-             name: master-user-data
-             namespace: openstack-provider-system
-           trunk: false
-       versions:
-         kubelet: 1.14.3
-         controlPlane: 1.14.3
-   - apiVersion: "cluster.k8s.io/v1alpha1"
-     kind: Machine
-     metadata:
-       generateName: openstack-node-
-       labels:
-         set: node
-     spec:
-       providerSpec:
-         value:
-           apiVersion: "openstackproviderconfig/v1alpha1"
-           kind: "OpenstackProviderSpec"
-           flavor: cluster
-           image: CentOS-7-1905
-           sshUserName: centos
-           keyName: cluster-api-provider-openstack
-           availabilityZone: nova
-           networks:
-           - uuid: <PRIVATE-NET-UUID>
-           floatingIP: <FLOATING-IP>
-           securityGroups:
-           - uuid: <SECURITY-GROUP-UUID>
-           userDataSecret:
-             name: worker-user-data
-             namespace: openstack-provider-system
-           trunk: false
-       versions:
-         kubelet: 1.14.3
-
-
-cluster 생성
-=============
+clusterctl 로 cluster를 생성한다.
 
 create k8s cluster on openstack
 -------------------------------
 
-.. code-block:: bash
-
-   $ clusterctl create cluster --bootstrap-type kind --provider openstack -c ./out/cluster.yaml -m ./out/machines.yaml -p ./out/provider-components.yaml
-
-KUBECONFIG 설정 후 kind k8s cluster를 확인할 수 있다.
+*clusterctl이 실행되는 동안 멈추지 말고 기다려야 한다.*
 
 .. code-block:: bash
 
-   $ export KUBECONFIG="$(kind get kubeconfig-path --name="clusterapi")"
-   $ kubectl get pods --all-namespaces
+   $ clusterctl create cluster --bootstrap-type kind --provider openstack -c ~/cluster.yaml -m ~/machines.yaml -p ~/provider-components.yaml
 
+Useful Commands
+----------------
 
-생성완료 후 node 조회
----------------------
+* 140-get-kind-cluster.sh: kind에 생성된 pod를 모두 조회한다.
+* 141-get-nodes.sh: clsterctl이 끝난 후 구축된 k8s cluster의 node를 조회한다.
+* 142-logs-kind-controller.sh: clusterctl이 실행될 때 kind의 clusterapi-controller log를 확인한다.
+* 143-check-user-data-vm.sh: 생성된 master vm의 user-data 파일을 확인한다. YOUR-NODE-IP가 host의 ip로 잘 바뀌었는지 확인한다.
+* 144-logs-cloud-init-vm.sh: master vm이 생성되고 init되는 과정의 log를 확인한다.
+* 145-logs-k8s-install-vm.sh: init 이후, vm에 k8s가 구축되는 과정의 log를 확인한다.
+* 146-delete-kind.sh: kind cluster와 생성된 master 및 worker vm을 삭제한다. clusterctl 도중 문제가 발생했을 경우 이 script를 실행하고 다시 cluster를 구축한다.
 
-.. code-block:: bash
+05-check-pivot
+===============
 
-   $ kubectl get nodes --kubeconfig kubeconfig
+clsuterctl 이 종료된 후, kind에 있던 clusterapi-controller가 kubernetes cluster 내부로 pivot 되었는지 확인한다.
 
-
-Cluster API Test
-================
-
-Master에 cluster-api pod 확인
------------------------------
-
-Openstack instance 조회
-
-.. code-block:: bash
-
-   $ openstack server list
-   +--------------------------------------+------------------------+--------+-------------------------------------+---------------+-----------+
-   | ID                                   | Name                   | Status | Networks                            | Image         | Flavor    |
-   +--------------------------------------+------------------------+--------+-------------------------------------+---------------+-----------+
-   | 96a44562-8fef-42b0-9f98-3345006953b5 | openstack-node-qjcjv   | ACTIVE | private-net=172.30.1.3, 10.10.10.19 | CentOS-7-1905 | m1.medium |
-   | bec5d7b0-99c7-4046-90dc-d443e4062b20 | openstack-master-z5c8n | ACTIVE | private-net=172.30.1.11, 10.10.10.3 | CentOS-7-1905 | m1.medium |
-   | 9a995125-e00c-490e-a945-2689c66abf7f | test                   | ACTIVE | private-net=172.30.1.4              | Cirros-0.4.0  | m1.tiny   |
-   +--------------------------------------+------------------------+--------+-------------------------------------+---------------+-----------+
-
-master 접속 후 namespace, pod 확인
+master vm으로 ssh 접속하여 k8s namespace를 확인한다.
+openstack-provider-system namespace의 clusterapi-controller pod를 확인한다.
 
 .. code-block:: bash
 
-   $ ssh -i ~/.ssh/openstack_tmp centos@10.10.10.3
-   $ sudo su
-   $ kubectl get namespaces
-   NAME                        STATUS   AGE
-   default                     Active   2d21h
-   kube-node-lease             Active   2d21h
-   kube-public                 Active   2d21h
-   kube-system                 Active   2d21h
-   openstack-provider-system   Active   2d21h
-   system                      Active   2d21h
-   $ kubectl get pods -n openstack-provider-system
-   NAME                       READY   STATUS    RESTARTS   AGE
-   clusterapi-controllers-0   1/1     Running   0          2d21h
+   $ MASTER_VM_IP=$(openstack server list | grep master | awk '{print $9}')
+   $ ssh -i ~/.ssh/openstack_tmp centos@${MASTER_VM_IP} -t "sudo kubectl get namespaces"
+   $ ssh -i ~/.ssh/openstack_tmp centos@${MASTER_VM_IP} -t "sudo kubectl get pods -n openstack-provider-system"
 
+06-check-clusterapi
+====================
 
-Self-healing Test
-------------------
+cluster가 clusterapi-controller를 통해서 self-healing & self-management가 되고 있는지 확인한다.
 
-Openstack instance 조회
-
-.. code-block::
-
-   $ openstack server list
-   +--------------------------------------+------------------------+--------+-------------------------------------+---------------+-----------+
-   | ID                                   | Name                   | Status | Networks                            | Image         | Flavor    |
-   +--------------------------------------+------------------------+--------+-------------------------------------+---------------+-----------+
-   | 96a44562-8fef-42b0-9f98-3345006953b5 | openstack-node-qjcjv   | ACTIVE | private-net=172.30.1.3, 10.10.10.19 | CentOS-7-1905 | m1.medium |
-   | bec5d7b0-99c7-4046-90dc-d443e4062b20 | openstack-master-z5c8n | ACTIVE | private-net=172.30.1.11, 10.10.10.3 | CentOS-7-1905 | m1.medium |
-   | 9a995125-e00c-490e-a945-2689c66abf7f | test                   | ACTIVE | private-net=172.30.1.4              | Cirros-0.4.0  | m1.tiny   |
-   +--------------------------------------+------------------------+--------+-------------------------------------+---------------+-----------+
-
-worker vm삭제
+worker vm을 삭제하고 다시 생성되는지 테스트한다.
 
 .. code-block:: bash
 
-   $ openstack server delete openstack-node-qjcjv
+   $ WORKER=$(openstack server list | grep node | awk '{print $4}')
+   $ openstack server delete ${WORKER}
 
-clusterapi-controllers log 확인
-
-.. code-block:: bash
-
-   $ ssh -i ~/.ssh/openstack_tmp centos@10.10.10.3
-   $ sudo su
-   $ kubectl logs -f clusterapi-controllers-0 -n openstack-provider-system   
-
-다시 생성된 worker vm 확인
+worker vm을 삭제했을 때, clusterapi-controller의 log를 확인한다.
 
 .. code-block:: bash
 
-   $ openstack server list
-   +--------------------------------------+------------------------+--------+-------------------------------------+---------------+-----------+
-   | ID                                   | Name                   | Status | Networks                            | Image         | Flavor    |
-   +--------------------------------------+------------------------+--------+-------------------------------------+---------------+-----------+
-   | ec0e0b35-3611-4e65-9415-dccdd7a7c06d | openstack-node-qjcjv   | ACTIVE | private-net=172.30.1.3, 10.10.10.19 | CentOS-7-1905 | m1.medium |
-   | bec5d7b0-99c7-4046-90dc-d443e4062b20 | openstack-master-z5c8n | ACTIVE | private-net=172.30.1.11, 10.10.10.3 | CentOS-7-1905 | m1.medium |
-   | 9a995125-e00c-490e-a945-2689c66abf7f | test                   | ACTIVE | private-net=172.30.1.4              | Cirros-0.4.0  | m1.tiny   |
-   +--------------------------------------+------------------------+--------+-------------------------------------+---------------+-----------+
+   $ MASTER_VM_IP=$(openstack server list | grep master | awk '{print $9}')
+   $ ssh -i ~/.ssh/openstack_tmp centos@${MASTER_VM_IP} -t "sudo kubectl logs -f clusterapi-controllers-0 -n openstack-provider-system"
 
-
-생성과정 debugging
-==================
-
-host node에서 kind 내의 clusterapi-controller log 확인
-------------------------------------------------------
-
-.. code-block:: bash
-
-   $ export KUBECONFIG="$(kind get kubeconfig-path --name="clusterapi")"
-   $ kubectl logs -f clusterapi-controllers-0 -n openstack-provider-system
-
-
-생성중인 vm에 접속해서 확인
----------------------------
-
-.. code-block:: bash
-
-   $ ssh centos@FLOATING-IP -i ~/.ssh/openstack_tmp
- 
-   #userdata 확인
-   $ sudo cat /var/lib/cloud/instance/user-data.txt
- 
-   #userdata를 직접 실행해보며 문제를 파악할 수 있음
-   $ sudo cd /var/lib/cloud/instance/
-   $ sudo bash user-data.txt
- 
-   #cloud init 실행 확인
-   sudo tail -f /var/log/cloud-init.log
- 
-   #k8s 설치 과정 확인
-   sudo tail -f /var/log/messages
