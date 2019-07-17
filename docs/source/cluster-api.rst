@@ -47,7 +47,7 @@ Controller Pattern
 
 clusterapi-scripts를 clone 받는다.
 
-.. code block:: bash
+.. code-block:: bash
 
    $ git clone https://github.com/openinfradev/openinfraday-2019-clusterapi-scripts.git
    $ cd openinfraday-2019-clusterapi-scripts
@@ -190,7 +190,7 @@ clusterctl로 배포할 환경의 정보를 입력한다.
    $ openstack project list | grep admin | awk '{print $2}'
 
 .. code-block:: yaml
-   :Caption: vi ~/clouds.yaml
+   :Caption: ~/clouds.yaml
 
    PROJECT_ID=$(openstack project list | grep admin | awk '{print $2}')
    
