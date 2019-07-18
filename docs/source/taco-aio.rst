@@ -76,6 +76,7 @@ ansible-playbook 실행 시 필요한 변수 값을 재정의한다.
 |
 
 * 위에서 확인한 값들로 extra-vars.yml 파일의 다음 값들을 수정한다.
+
   * monitor_interface: bond0 확인
   * public_network & cluster_network: 호스트의 네트워크 대역 입력
   * lvm_molumes를 변경: ceph용 디스크명 입력
