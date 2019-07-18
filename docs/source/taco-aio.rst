@@ -265,6 +265,7 @@ cinder-api의 replicas를 2개로 증가시켜 본다.
    $ kubectl edit deploy cinder-api -n openstack
 
 .. figure:: _static/replica.png
+|
 
 cinder-api pod의 수가 2개로 늘어나는 것을 확인할 수 있다. 
 
@@ -283,10 +284,12 @@ pod를 삭제시켜도 다시 복구 되는 것을 확인해본다.
    > pod "cinder-api-6cf957dbb9-8gt9h" deleted
 
    $ kubectl get pod -n openstack 
+|
+
+cinder-api pod가 새로 생성되고 있는 것을 확인할 수 있다. 
 
 .. figure:: _static/poddelete.png
 
-cinder-api pod가 새로 생성되고 있는 것을 확인할 수 있다. 
 
 |
 |
