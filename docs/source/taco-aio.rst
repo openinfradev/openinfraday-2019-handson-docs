@@ -6,7 +6,7 @@ tacoplay 설정
 =============
 
 Tacoplay 받아서 준비하기
------------------------
+------------------------
 
 .. code-block:: bash
 
@@ -34,7 +34,7 @@ Tacoplay 받아서 준비하기
 |
 
 ceph-ansible site.yml 생성
--------------------------
+--------------------------
 
 .. code-block:: bash
 
@@ -49,7 +49,8 @@ taco 클러스터를 구성하는 노드들을 역할에 맞게 정의한다.
 
 * ex) 노드 3대를 사용할 경우
 
-.. figure:: _static/hostsini.png
+.. figure:: _static/hosts.png
+
 |
 
 * 노드 1대를 사용할 경우
@@ -68,11 +69,13 @@ ansible-playbook 실행 시 필요한 변수 값을 재정의한다.
 * 아무것도 mount되어있지 않은 디스크 중에서 용량이 가장 큰 2가지를 선택한다.
 
 .. figure:: _static/lsblkk.png
+
 |
 
 * host의 ip주소를 확인한다.
 
-.. figure:: _static/ipaa.png
+.. figure:: _static/ipa2.png
+
 |
 
 * 위에서 확인한 값들로 extra-vars.yml 파일의 다음 값들을 수정한다.
@@ -86,7 +89,7 @@ ansible-playbook 실행 시 필요한 변수 값을 재정의한다.
    $ cd ~/tacoplay/inventory/sample
    $ vi extra-vars.yml
 
-.. figure:: _static/extraa.png
+.. figure:: _static/cidr.png
 
 |
 |
@@ -148,7 +151,7 @@ TACO 설치 확인
 ==============
 
 Pod 상태 확인
---------
+--------------
 
 .. code-block:: bash
    
@@ -193,7 +196,7 @@ Script를 통해 Openstack에서 사용할 bridge 및 IP masquerading을 위한 
 |
 
 Openstack 설치 검증
-------------------
+-------------------
 
 .. code-block:: bash
 
@@ -230,7 +233,7 @@ VM 생성 후
 |
 
 생성된 VM에 접속, 외부 통신 확인
--------------------------------
+--------------------------------
 
 ssh로 VM 에 접속 후, 네트워크 접속 상태를 확인하기 위해 ping 테스트를 수행한다. 
 
@@ -265,6 +268,7 @@ cinder-api의 replicas를 2개로 증가시켜 본다.
    $ kubectl edit deploy cinder-api -n openstack
 
 .. figure:: _static/replica.png
+
 |
 
 cinder-api pod의 수가 2개로 늘어나는 것을 확인할 수 있다. 
@@ -284,6 +288,7 @@ pod를 삭제시켜도 다시 복구 되는 것을 확인해본다.
    > pod "cinder-api-6cf957dbb9-8gt9h" deleted
 
    $ kubectl get pod -n openstack 
+
 |
 
 cinder-api pod가 새로 생성되고 있는 것을 확인할 수 있다. 
