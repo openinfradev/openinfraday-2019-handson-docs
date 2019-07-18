@@ -23,6 +23,9 @@ Cluster API Hands-on 구조
 .. figure:: _static/taco-clusterapi-diagram.png
 
 
+---------------
+
+
 Hands-on 후 알게 되는 내용
 ===========================
 
@@ -53,6 +56,9 @@ clusterapi-scripts를 clone 받는다.
    $ cd openinfraday-2019-clusterapi-scripts
 
 이후에는 ``./01-install-tools.sh`` 와 같이 scripts를 하나씩 실행하면 된다.
+
+
+------------------
 
 
 01-install-tools
@@ -123,6 +129,9 @@ bootstraping machine tool 설치 (kind)
    $ GO111MODULE="on" go get sigs.k8s.io/kind@v0.4.0
 
 
+----------------
+
+
 02-prepare-openstack-resource
 ===============================
 
@@ -169,6 +178,9 @@ master vm과 worker vm에 부여할 2개의 floating ip 를 미리 생성한다.
 
    $ openstack floating ip create public-net
    $ openstack floating ip create public-net
+
+
+-------------------
 
 
 03-prepare-clusterctl
@@ -316,6 +328,9 @@ machines.yaml 수정
    $ cp -f out/provider-components.yaml ~/
 
 
+---------------
+
+
 04-make-cluster
 ================
 
@@ -342,6 +357,10 @@ Useful Commands
 * 145-logs-k8s-install-vm.sh: init 이후, vm에 k8s가 구축되는 과정의 log를 확인한다.
 * 146-delete-kind.sh: kind cluster와 생성된 master 및 worker vm을 삭제한다. clusterctl 도중 문제가 발생했을 경우 이 script를 실행하고 03 script	부터 다시 실행하여 새로운 cluster를 구축한다.
 
+
+-----------------
+
+
 05-check-pivot
 ===============
 
@@ -355,6 +374,10 @@ openstack-provider-system namespace의 clusterapi-controller pod를 확인한다
    $ MASTER_VM_IP=$(openstack server list | grep master | awk '{print $9}')
    $ ssh -i ~/.ssh/openstack_tmp centos@${MASTER_VM_IP} -t "sudo kubectl get namespaces"
    $ ssh -i ~/.ssh/openstack_tmp centos@${MASTER_VM_IP} -t "sudo kubectl get pods -n openstack-provider-system"
+
+
+----------------
+
 
 06-check-clusterapi
 ====================
