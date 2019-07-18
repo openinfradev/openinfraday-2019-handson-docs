@@ -5,7 +5,8 @@ TACO install - aio node
 tacoplay 설정
 =============
 
-* Tacoplay 받아서 준비하기
+Tacoplay 받아서 준비하기
+-----------------------
 
 .. code-block:: bash
 
@@ -18,12 +19,13 @@ tacoplay 설정
 
 |
 
-* 하위 프로젝트들 fetch
+하위 프로젝트들 fetch
+---------------------
 
-   * armada :  armada 설치에 필요한 소스
-   * ceph-ansible : ceph 설치에 사용되는 ansible playbook
-   * kubespray : kubernetes 설치에 사용되는 ansible playbook
-   * charts : kubernetes위에 openstack을 배포하는 데 필요한 helm chart  
+* armada :  armada 설치에 필요한 소스
+* ceph-ansible : ceph 설치에 사용되는 ansible playbook
+* kubespray : kubernetes 설치에 사용되는 ansible playbook
+* charts : kubernetes위에 openstack을 배포하는 데 필요한 helm chart  
 
 .. code-block:: bash
 
@@ -31,7 +33,8 @@ tacoplay 설정
    
 |
 
-* ceph-ansible site.yml 생성
+ceph-ansible site.yml 생성
+-------------------------
 
 .. code-block:: bash
 
@@ -39,37 +42,43 @@ tacoplay 설정
 
 |
    
-* hosts.ini 파일 설명
+hosts.ini 파일 설명
+-------------------
 
-| taco 클러스터를 구성하는 노드들을 역할에 맞게 정의한다.
-| ex) 노드 3대를 사용할 때 
+taco 클러스터를 구성하는 노드들을 역할에 맞게 정의한다.
+
+* ex) 노드 3대를 사용할 경우
 
 .. figure:: _static/hostsini.png
+|
 
-| ex) 노드 1대를 사용할 때  
+* 노드 1대를 사용할 경우
 
 .. figure:: _static/aiohostsini.png
 
 |
 
-* extra-vars.yml 파일 설명 
+extra-vars.yml 파일 수정 
+------------------------
 
-ansible-playbook 실행 시 필요한 변수 값을 정의한다.
+ansible-playbook 실행 시 필요한 변수 값을 재정의한다.
  
-| - monitor_interface, public_network, cluster_network, lvm_molumes 확인 후 적절한 값으로 수정 
 
-lsblk 명령어를 통해 ceph에서 사용할 수 있는 디스크를 확인한다. 
-아무것도 mount되어있지 않은 디스크 중에서 용량이 가장 큰 2가지를 선택한다.
+* lsblk 명령어를 통해 ceph에서 사용할 수 있는 디스크를 확인한다. 
+* 아무것도 mount되어있지 않은 디스크 중에서 용량이 가장 큰 2가지를 선택한다.
 
 .. figure:: _static/lsblkk.png
+|
 
-ip a 명령어로 host의 ip주소를 확인한다.
+* host의 ip주소를 확인한다.
 
 .. figure:: _static/ipaa.png
+|
 
-lsblk와 ip a 명령어를 통해 확인한 값들로 extra-vars.yml 파일의 monitor_interface, public_network, cluster_network, lvm_molumes를 변경
-
-이때 public_network, cluster_network를 호스트 네트워크 대역에 맞추어 설정한다.
+* 위에서 확인한 값들로 extra-vars.yml 파일의 다음 값들을 수정한다.
+  * monitor_interface: bond0 확인
+  * public_network & cluster_network: 호스트의 네트워크 대역 입력
+  * lvm_molumes를 변경: ceph용 디스크명 입력
 
 .. code-block:: bash
 
@@ -85,9 +94,10 @@ lsblk와 ip a 명령어를 통해 확인한 값들로 extra-vars.yml 파일의 m
 OS 설정
 =======
 
-* 호스트 파일 설정
+호스트 파일 설정
+----------------
 
-/etc/hosts 에서 127.0.0.1에 taco-aio를 추가해준다. 
+/etc/hosts 파일을 열고 127.0.0.1에 "taco-aio"를 추가해준다. 
 
 .. code-block:: bash
 
@@ -101,7 +111,8 @@ OS 설정
 TACO 설치
 =========
 
-* TACO playbook 실행에 필요한 패키지 설치 
+TACO playbook 실행에 필요한 패키지 설치 
+---------------------------------------
 
 아래 코드는 순서를 지켜서 실행해야함.
 
@@ -115,7 +126,8 @@ TACO 설치
 |
   
 
-* Taco 설치
+Taco 설치
+---------
 
 .. code-block:: bash
 
@@ -123,9 +135,10 @@ TACO 설치
    $ ansible-playbook -b -i inventory/sample/hosts.ini -e @inventory/sample/extra-vars.yml site.yml
    
 
-| ansible-playbook 옵션 설명 
-| -i : 사용할 inventory 파일 지정
-| -e : 실행시간에 변수 값 전달
+ansible-playbook 옵션 설명 
+
+* -i : 사용할 inventory 파일 지정
+* -e : 실행시간에 변수 값 전달
 
 |
 |
@@ -133,7 +146,8 @@ TACO 설치
 TACO 설치 확인
 ==============
 
-* pod 확인
+Pod 상태 확인
+--------
 
 .. code-block:: bash
    
@@ -142,26 +156,33 @@ TACO 설치 확인
    $ watch 'kubectl get pods -n openstack | grep -v Com'   <- Completed 된 상태의 pod를 제외하고 실시간으로 확인
 
   
-다음 사진과 같이 pod가 다 뜨게 되면 taco설치가 완료되었다. (kubectl get pods -n openstack | grep -v Com 실행결과)
+다음 사진과 같이 pod가 다 뜨게 되면 taco 설치가 완료된 것이다. (kubectl get pods -n openstack | grep -v Com 실행결과)
 
 .. figure:: _static/getpod.png
 
 |
 
-* horizon 접속
+Horizon 접속
+------------
  
-http://IP:31000    <-배정받은 machine의 ip를 넣어준다.
+Openstack dashboard인 Horizon에 접속해본다.
+
+* http://HOST_IP:31000    <- 배정받은 machine의 ip를 넣어준다.
 
 .. figure:: _static/horizon.png
 
-| domain : default
-| id : admin
-| pw : password
+계정정보
+
+* domain : default
+* id : admin
+* pw : password
 
 |
 
 
-* Network 설정
+Network 설정
+------------
+Script를 통해 Openstack에서 사용할 bridge 및 IP masquerading을 위한 iptables rule 추가 등의 작업을 수행한다.
 
 .. code-block:: bash
    
@@ -170,7 +191,8 @@ http://IP:31000    <-배정받은 machine의 ip를 넣어준다.
 
 |
 
-* Openstack 설치 검증
+Openstack 설치 검증
+------------------
 
 .. code-block:: bash
 
@@ -178,13 +200,14 @@ http://IP:31000    <-배정받은 machine의 ip를 넣어준다.
    $ scripts/taco-test.sh
    
 
-| 위의 script를 수행하면 다음과 같은 task들을 수행하여 Openstack이 정상 동작하는지 검증하게 된다.
-   * (가상) Network 및 Router 생성
-   * Cirros Image upload
-   * SecurityGroup 생성
-   * Keypair Import
-   * VM 생성 후 floating IP 추가
-   * Volume 생성 후 VM에 추가
+위의 script를 수행하면 다음과 같은 task들을 수행하여 Openstack이 정상 동작하는지 검증하게 된다.
+
+* (가상) Network 및 Router 생성
+* Cirros Image upload
+* SecurityGroup 생성
+* Keypair Import
+* VM 생성 후 floating IP 추가
+* Volume 생성 후 VM에 추가
 
 |
 |
@@ -192,9 +215,10 @@ http://IP:31000    <-배정받은 machine의 ip를 넣어준다.
 VM 생성 후
 ==========
 
-* 생성된 VM 확인하기
+생성된 VM 확인하기
+------------------
 
-다음과 같은 명령어를 통해 taco-test 스크립트를 돌려 생성된 VM을 확인할 수 있다. 결과 Networks 란에서 생성된 VM 의 ip 주소를 확인한다.
+다음 명령어를 통해 taco-test 스크립트를 돌려 생성된 VM을 확인할 수 있다. 결과 Networks 란에서 생성된 VM 의 floating IP 주소를 확인한다.
 
 .. code-block:: bash
 
@@ -204,13 +228,16 @@ VM 생성 후
 
 |
 
-* 생성된 VM에 접속, 외부 통신 확인
+생성된 VM에 접속, 외부 통신 확인
+-------------------------------
 
 ssh로 VM 에 접속 후, 네트워크 접속 상태를 확인하기 위해 ping 테스트를 수행한다. 
 
 .. code-block:: bash
 
    [root@taco-aio ~]# ssh cirros@10.10.10.3    (<- 생성된 VM의 ip주소를 넣는다.)
+
+   # VM 내부에서 수행
    $ ping 8.8.8.8
    PING 8.8.8.8 (8.8.8.8): 56 data bytes
    64 bytes from 8.8.8.8: seq=0 ttl=53 time=1.638 ms
@@ -225,11 +252,12 @@ ssh로 VM 에 접속 후, 네트워크 접속 상태를 확인하기 위해 ping
 K8S pod test
 ============
 
-* scale up 
+Scale-Out 테스트
+----------------
 
-scale up 혹은 scale down이 필요할 경우, deployment 설정을 수정하여 간단히 pod의 수를 조절할 수 있다.
+Deployment 설정을 수정하여 간단히 pod의 수를 조절할 수 있다.
 
-cinder-api의 replicas를 2개로 증가시켜 보았다. 
+cinder-api의 replicas를 2개로 증가시켜 본다. 
 
 .. code-block:: bash
    
@@ -243,9 +271,10 @@ cinder-api pod의 수가 2개로 늘어나는 것을 확인할 수 있다.
 
 |
 
-* self-healing
+Self-Healing 테스트
+-------------------
 
-pod를 삭제 시켜도 다시 복구 되는 것을 확인해본다.
+pod를 삭제시켜도 다시 복구 되는 것을 확인해본다.
 
 .. code-block:: bash
 
@@ -270,7 +299,6 @@ Trouble Shoothing
 .. code-block:: bash
 
    $ . tacoplay/scripts/adminrc
-
 
 
 
