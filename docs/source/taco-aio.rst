@@ -94,6 +94,25 @@ ansible-playbook 실행 시 필요한 변수 값을 재정의한다.
 |
 |
 
+* armada-manifest.yaml 수정
+
+
+예시 파일로 주어진 armada-manifest.yaml에서는 모든 차트의 source 디렉토리 위치
+가 ``/home/centos/tacoplay/...`` 로 되어있다.
+
+.. figure:: _static/pwd2.png
+
+이를 자신의 환경에 tacoplay가 설치되어 있는 경로로 수정 한다. 
+현재 실습 환경에서는 tacoplay는 /root 디렉토리 밑에 설치되어 있으므로 아래와 같은 sed명령어를 통해 변경할 수 있다. 
+
+.. code-block:: bash
+
+   $ cd ~/tacoplay
+   $ sed -i "s#/home/centos#/root#g" inventory/sample/armada-manifest.yaml
+
+|
+|
+
 
 OS 설정
 =======
