@@ -55,7 +55,7 @@ taco 클러스터를 구성하는 노드들을 역할에 맞게 정의한다.
 
 * 노드 1대를 사용할 경우
 
-.. figure:: _static/aiohostsini.png
+.. figure:: _static/hostt.png
 
 |
 
