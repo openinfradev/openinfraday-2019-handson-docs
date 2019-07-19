@@ -2,6 +2,51 @@
 TACO install - aio node
 ***********************
 
+Machine 접속방법
+================
+
+Linux/Mac 사용자
+-----------------
+
+etherpad에 공유해 놓은 MAC/LINUX 사용자용 private key를 복사 한 후 로컬 PC의 파일로 저장한다. 
+
+.. code-block:: bash 
+
+   # FILENAME에는 복사한 private key를 저장해놓은 파일명을, MACHINE_IP에는 배정받은 가상머신의 ip주소를 써주면 된다.
+
+   $ chmod 600 FILENAME     
+   $ ssh -i FILENAME root@MACHINE_IP
+
+|
+
+Window 사용자
+-------------
+
+1. PUTTY 설치
+
+다운로드: https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
+Putty만 사용할 것이므로 Alternatives binary files 항목에서 putty.exe 를 다운받아 설치한다. 
+
+2. 윈도우용 private key 저장
+메모장 프로그램을 이용하여 etherpad에 공유해 놓은 Window 사용자용 private key를 복사하여 원하는 이름의 .txt 파일로 저장한다. 
+
+3. PUTTY 실행
+
+접속하고자 하는 서버의 ip 주소를 적고 하단에 저장할 Session 의 이름을 정해준다. 
+
+.. figure:: _static/1.png
+
+좌측 Category 의 Connection-> SSH -> Auth 의 “Private Key file for authentication”에서 본인이 저장한 txt 파일을 불러온다. ( ppk 형식 이외의 파일들은 all files 옵션을 눌러야 불러올 수 있다)
+
+.. figure:: _static/2.png
+
+다시 Session 카테고리로 돌아가 지금까지의 정보를 save 를 눌러 저장한다. open 버튼으로 ssh 에 접속해 실행 화면이 뜨면 root 로 로그인한다.
+
+.. figure:: _static/3.png
+
+|
+|
+
 tacoplay 설정
 =============
 
