@@ -1,6 +1,18 @@
-***********************
+**********************
 TACO install - aio node
 ***********************
+
+
+.. figure:: _static/tacoplay_flow.png
+
+
+.. figure:: _static/taco_component.png
+
+
+.. figure:: _static/taco_aio.png
+
+
+|
 
 Machine 접속방법
 ================
@@ -56,7 +68,7 @@ ceph-ansible site.yml 생성
 설정 파일 설명 
 --------------
 
-인벤토리를 구성할 때 필요한 세 가지 설정파일들 
+인벤토리를 구성할 때 필요한 세 가지 설정파일들(위치:~/tacoplay/inventory/sample/) 
 
 .. figure:: _static/filelist.png
 
