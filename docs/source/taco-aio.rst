@@ -1,13 +1,26 @@
-**********************
+***********************
 TACO install - aio node
 ***********************
 
+TACO 설명
+=========
+ 
+tacoplay flow
+--------------
 
 .. figure:: _static/tacoplay_flow.png
 
+|
+
+taco 구성
+---------
 
 .. figure:: _static/taco_component.png
 
+|
+
+taco AIO 
+---------
 
 .. figure:: _static/taco_aio.png
 
@@ -24,6 +37,7 @@ root 계정으로 자신의 머신에 접속한 후 etherpad 에 공유해 놓�
    #MACHINE_IP에 배정받은 가상머신의 ip주소를 적는다.
    $ ssh root@MACHINE_IP
 
+|
 
 tacoplay 설정
 =============
