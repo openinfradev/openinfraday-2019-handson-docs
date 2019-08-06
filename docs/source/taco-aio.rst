@@ -82,7 +82,7 @@ ceph-ansible site.yml 생성
 설정 파일 설명 
 --------------
 
-인벤토리를 구성할 때 필요한 세 가지 설정파일들(위치:~/tacoplay/inventory/sample/) 
+인벤토리를 구성할 때 필요한 세 가지 설정파일들 (위치:~/tacoplay/inventory/sample/) 
 
 .. figure:: _static/filelist.png
 
